@@ -6,7 +6,7 @@
 
 
 (defn mandel [c]
-  (let [end 512]
+  (let [end 1000]
     (loop [z (complex. 0 0)
            n 0]
       (if (< n end)
@@ -23,26 +23,24 @@
 (def oy -0.004556107)
 
 (defn draw []
-  (if (q/mouse-pressed?) (println "pressed"))
    (time
     (let [^ints pxls (q/pixels)
         width (q/width)
         height (q/height)
         left (- ox (/ wo 2))
-        top (+ oy (/ wo 2))]
-      (dotimes [y height]
-        (let [row (* y width)]
-          (dotimes [x width]
-            (let [xc (double (+ (* (/ x width)  wo) left))
-                  yc (double (- (* (/ y height) wo) top))
-                  m  (mandel (complex. xc yc ))]
-              (if (< m 0)
-                (aset pxls (+ row x) (^int q/color 0 0 0))
-                (aset pxls (+ row x) (^int q/color (* m 255)
-                                                   (* m 128)
-                                                   200)))))))))
-  (println "drew")
-  (q/update-pixels))
+        top (+ oy (/ wo 2))
+        npix (for  [y (range height)
+                    x (range width) ]
+                (let [row (* y width)
+                      xc (double (+ (* (/ x width)  wo) left))
+                      yc (double (- (* (/ y height) wo) top))
+                      m  (mandel (complex. xc yc ))]
+                  (if (< m 0)
+                    [(+ row x) (^int q/color 0 0 0)]
+                    [(+ row x) (^int q/color (* m 255) (* m 128) 200)])))]
+        (doall (map (fn [[i el]] (aset pxls i el)) npix))
+        (println "drew")
+        (q/update-pixels))))
 
 (q/defsketch example
   :title "image demo"
