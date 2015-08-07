@@ -22,29 +22,41 @@
 (def ox 0.2694911)
 (def oy -0.004556107)
 
+(defn set-color [^double m index ^ints pxls]
+  (if (< m 0)
+    (aset pxls index (^int q/color 0 0 0))
+    (aset pxls index (^int q/color (* m 255) (* m 128) 200))))
+
+(defrecord point [^double x ^double y])
+
 (defn draw []
    (time
-    (let [^ints pxls (q/pixels)
-          width (q/width)
-          height (q/height)
-          left (- ox (/ wo 2))
-          top (+ oy (/ wo 2))
-          npix (for  [y (range height)
-                      x (range width) ]
-                 (let [row (* y width)
-                       xc (double (+ (* (/ x width)  wo) left))
-                       yc (double (- (* (/ y height) wo) top))
-                       index (+ row x)]
-                    [x y xc yc index]))]
+    (let [
+            ^ints pxls (q/pixels)
+            width (q/width)
+            height (q/height)
+            left (- ox (/ wo 2))
+            top (+ oy (/ wo 2))
+          ]
 
         (doall
-          (map
-            (fn [[x y xc yc i]]
-              (let [m (mandel (complex. xc yc ))]
-                (if (< m 0)
-                  (aset pxls i (^int q/color 0 0 0))
-                  (aset pxls i (^int q/color (* m 255) (* m 128) 200)))))
-            npix))
+          (pmap
+            #(doall
+                (map
+                  (fn [^point p]
+                    (let [
+                          x (.x p)
+                          y (.y p)
+                          row (* y width)
+                          xc (double (+ (* (/ x width)  wo) left))
+                          yc (double (- (* (/ y height) wo) top))
+                          m (mandel (complex. xc yc ))
+                          index (+ row x) ]
+                      (set-color m index pxls)))
+                  %))
+
+            (partition 16
+              (for [y (range height) x (range width) ] (point. x y)))))
         (println "drew")
         (q/update-pixels))))
 
