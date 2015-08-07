@@ -25,20 +25,26 @@
 (defn draw []
    (time
     (let [^ints pxls (q/pixels)
-        width (q/width)
-        height (q/height)
-        left (- ox (/ wo 2))
-        top (+ oy (/ wo 2))
-        npix (for  [y (range height)
-                    x (range width) ]
-                (let [row (* y width)
-                      xc (double (+ (* (/ x width)  wo) left))
-                      yc (double (- (* (/ y height) wo) top))
-                      m  (mandel (complex. xc yc ))]
-                  (if (< m 0)
-                    [(+ row x) (^int q/color 0 0 0)]
-                    [(+ row x) (^int q/color (* m 255) (* m 128) 200)])))]
-        (doall (map (fn [[i el]] (aset pxls i el)) npix))
+          width (q/width)
+          height (q/height)
+          left (- ox (/ wo 2))
+          top (+ oy (/ wo 2))
+          npix (for  [y (range height)
+                      x (range width) ]
+                 (let [row (* y width)
+                       xc (double (+ (* (/ x width)  wo) left))
+                       yc (double (- (* (/ y height) wo) top))
+                       index (+ row x)]
+                    [x y xc yc index]))]
+
+        (doall
+          (map
+            (fn [[x y xc yc i]]
+              (let [m (mandel (complex. xc yc ))]
+                (if (< m 0)
+                  (aset pxls i (^int q/color 0 0 0))
+                  (aset pxls i (^int q/color (* m 255) (* m 128) 200)))))
+            npix))
         (println "drew")
         (q/update-pixels))))
 
