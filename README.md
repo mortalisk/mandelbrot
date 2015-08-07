@@ -1,18 +1,14 @@
 # mandel
 
-A Quil sketch designed to ... well, that part is up to you.
+A Quil sketch designed to generate and visualise the mandelbrot set
 
 ## Usage
 
-LightTable - open `core.clj` and press `Ctrl+Shift+Enter` to evaluate the file.
-
-Emacs - run cider, open `core.clj` and press `C-c C-k` to evaluate the file.
-
-REPL - run `(require 'mandel.core)`.
+install leiningen, then run 'lein run'
 
 ## License
 
-Copyright © 2014 FIXME
+Copyright © 2014 Morten Bendiksen
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
